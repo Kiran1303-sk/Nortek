@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const fs = require('fs');
 const crypto = require('crypto');
 const multer = require('multer');
 const nodemailer = require('nodemailer');
@@ -34,6 +35,11 @@ const ENABLE_CSP_REPORT_ONLY = process.env.ENABLE_CSP_REPORT_ONLY
   ? process.env.ENABLE_CSP_REPORT_ONLY === 'true'
   : IS_PRODUCTION;
 const LOG_CSP_REPORTS = process.env.LOG_CSP_REPORTS === 'true';
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
+
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
 
 const signToken = (payload, expiresIn = process.env.JWT_EXPIRES_IN || '30min') =>
   jwt.sign(payload, JWT_SECRET, { expiresIn });
@@ -288,7 +294,7 @@ const authorizeRoles = (...roles) => (req, res, next) => {
 
 // ================= FILE UPLOAD =================
 const storage = multer.diskStorage({
-  destination: (_, __, cb) => cb(null, 'uploads'),
+  destination: (_, __, cb) => cb(null, UPLOADS_DIR),
   filename: (_, file, cb) =>
     cb(null, `${Date.now()  }-${  file.originalname.replace(/\s+/g, '-')}`)
 });

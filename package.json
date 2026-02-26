@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "start": "node server.js",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
     "format": "prettier . --write",
